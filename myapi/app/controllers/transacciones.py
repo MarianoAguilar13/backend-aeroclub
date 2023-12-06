@@ -1,5 +1,8 @@
 from app.models.transacciones import Transacciones
 from app.models.tipo_pago import TipoPago
+from app.models.cuenta_corriente import CuentaCorriente
+from app.models.user_model import Usuarios
+from app.models.tipo_pago import TipoPago
 from app import db
 from flask import jsonify
 
@@ -69,16 +72,21 @@ class TransaccionesController:
 
         try:
             transacciones = Transacciones.query.all()
-            transaccion_list = []
+            transaccion_list = []    
 
             for transaccion in transacciones:
-                
+
+                idCuentaCorriente = transaccion.cuenta_corriente_id
+                cuentaCorriente = db.session.query(CuentaCorriente).filter_by(id_cuenta_corriente=idCuentaCorriente).first()
+                usuario = db.session.query(Usuarios).filter_by(id_usuarios=cuentaCorriente.usuarios_id).first()
+                tipoPago = db.session.query(TipoPago).filter_by(id_tipo_pago=transaccion.tipo_pago_id).first()
                 transaccion_data = {
                     'id_transacciones': transaccion.id_transacciones,
+                    'nombre_completo_usuario': usuario.nombre + " " + usuario.apellido,
                     'monto': transaccion.monto,
                     'fecha': transaccion.fecha,
                     'motivo': transaccion.motivo,
-                    'tipo_pago_id': transaccion.tipo_pago_id,
+                    'tipo_pago_id': tipoPago.tipo,
                     'cuenta_corriente_id': transaccion.cuenta_corriente_id,
                 }
                 transaccion_list.append(transaccion_data)
