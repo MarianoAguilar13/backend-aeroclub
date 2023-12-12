@@ -73,6 +73,30 @@ def get_instructor():
     else:
         response = jsonify({'message': 'Unauthorized'})
         return response, 401
+    
+#Obtener todos los Asociados
+@usuarios_bp.route('/asociados', methods=['GET'])
+def get_asociados():
+    
+    has_access = Security.verify_token(request.headers)
+    
+    if has_access:
+        try:
+
+            usuarioController = UsuariosController() 
+            usuarios = usuarioController.obtenerAsociados()
+
+            if usuarios:
+                return jsonify({'respuesta': usuarios, 'success': True})
+            else:
+                jsonify({'message': "No se encontraron usuarios", 'success': False})
+
+        except Exception as ex:
+            print(ex)
+            return jsonify({'message': "ERROR", 'success': False})
+    else:
+        response = jsonify({'message': 'Unauthorized'})
+        return response, 401    
 
 
 @usuarios_bp.route('/', methods=['POST'])

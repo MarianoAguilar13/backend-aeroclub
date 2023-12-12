@@ -231,3 +231,45 @@ class UsuariosController:
         except Exception as ex:
                 print(ex.args)
                 return False
+        
+    def obtenerAsociados(self):
+        try:
+            # Obtener id_usuarios de UsuariosTienenRol con id_roles == 2
+            rolAsociado = db.session.query(Roles).filter_by(tipo='Asociado').first()
+            asociado_id = db.session.query(UsuarioTieneRoles).filter_by(roles_id=rolAsociado.id_roles).all() 
+            
+            # Almacena los id_usuarios en una lista
+            id_usuarios_rol_asociado = [usuario.usuarios_id for usuario in asociado_id]
+            
+            # Obtener los datos de los usuarios del array id_usuarios_rol_asociado
+            asociados_list = db.session.query(Usuarios).filter(Usuarios.id_usuarios.in_(id_usuarios_rol_asociado)).all()
+            
+            # Construir la lista con los datos de cada instrutor
+            asociados_data = [
+                {
+                    'id_usuarios': asociado.id_usuarios,
+                    'nombre': asociado.nombre,
+                    'apellido': asociado.apellido,
+                    'email': asociado.email,
+                    'telefono': asociado.telefono,
+                    'dni': asociado.dni,
+                    'fecha_alta': asociado.fecha_alta,
+                    'fecha_baja': asociado.fecha_baja,
+                    'direccion': asociado.direccion,
+                    'foto_perfil': asociado.foto_perfil,
+                    'estado_hab_des': asociado.estado_hab_des,
+                    'roles': [
+                        {
+                            'id_roles': rol.id_roles,
+                            'tipo': rol.tipo,
+                        }
+                        for rol in asociado.roles if rol.id_roles
+                    ]
+                }
+                for asociado in asociados_list if asociado.estado_hab_des != 0
+            ]
+            
+            return asociados_data
+        except Exception as ex:
+                print(ex.args)
+                return False

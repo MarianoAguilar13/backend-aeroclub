@@ -108,3 +108,25 @@ class RolesController:
                 return 4
 
   
+    def asignarAsociadoPorDefecto(self,email):
+            
+            try:     
+
+                #Obtenemos el userDictionary
+                userDictionary = UsuariosController.obtenerUsuarioPorEmail(self,email)        
+                       
+                rolDictionary = db.session.execute(db.select(Roles).filter_by(tipo="Asociado")).scalar_one()
+                #creo el usuarioTieneRoles
+
+                usuarioTieneRoles = UsuarioTieneRoles(0,userDictionary.get('id_usuarios'),rolDictionary.id_roles)
+
+                db.session.add(usuarioTieneRoles)
+                db.session.commit()              
+
+                return True
+
+             
+              
+            except Exception as ex:
+                print(ex)
+                return False

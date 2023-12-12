@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
 from app.utils.Security import Security
 from app.controllers.usuarios import UsuariosController
+from app.controllers.roles import RolesController
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -24,10 +25,17 @@ def authCrearYDevolverToken():
         respuestaCrearUsuario = usuarioController.crearUsuario(data)
 
         if respuestaCrearUsuario:
+            
+            rolesController = RolesController()
+            respuestaRoles = rolesController.asignarAsociadoPorDefecto(email)
 
-            encoded_token = Security.generate_token(email)
+            if respuestaRoles:
+                encoded_token = Security.generate_token(email)
 
-            return jsonify({'token': encoded_token, 'success': True})
+                return jsonify({'token': encoded_token, 'success': True})
+            
+            else:
+                return jsonify({'message': "No se pudo asignar el rol por defecto de Asociado", 'success': False})
             
         else:
             return jsonify({'message': "No se pudo crear el usuario", 'success': False})
