@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
 from app.controllers.recibosVuelos import RecibosController 
 from app.controllers.transacciones import TransaccionesController
+from app.controllers.recibos_pdf import ReciboPDF
 from app.utils.Security import Security
 
 
@@ -93,9 +94,16 @@ def crear_recibos_vuelos():
                 if respuesta == 10:
                     return jsonify({'message': 'El Asociado no es un usuario válido', 'success': False})
                 if respuesta == 11:
-                    return jsonify({'message': 'El Gestor no es un usuario válido', 'success': False})         
-                if respuesta == 13:
-                    return jsonify({'message': 'Recibo creado satisfactoriamente', 'success': True})        
+                    return jsonify({'message': 'El Gestor no es un usuario válido', 'success': False})
+                if respuesta[0] == 13:
+                    recibo_pdf = ReciboPDF()
+                    respuesta = recibo_pdf.crear_pdf(respuesta[1])
+                    if respuesta:
+                        return jsonify({'message': 'Recibo creado satisfactoriamente', 'success': True})        
+                    else:
+                        return jsonify({'message': 'Se creó el recibo pero no se envio el mail por algun motivo', 'success': True})        
+            
+                                
             
         except Exception as ex:
             print(ex.args)

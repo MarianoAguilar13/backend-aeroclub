@@ -129,7 +129,7 @@ class ReciboPDF(FPDF):
                 ruta_actual = os.path.abspath(__file__)
 
                 # Retrocede dos niveles para llegar a la "carpeta raíz" del proyecto
-                ruta_pdf = os.path.abspath(os.path.join(ruta_actual, '..', '..', '..',f'../{nombre_pdf}'))
+                ruta_pdf = os.path.abspath(os.path.join(ruta_actual,'..', '..',f'../{nombre_pdf}'))
                 os.remove(ruta_pdf)
                 print(f"Archivo {ruta_pdf} eliminado exitosamente.")
             except FileNotFoundError:

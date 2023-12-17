@@ -52,6 +52,20 @@ class RecibosController:
         
         return 0
     
+    def __obtenerMayorTarifa(tarifas):
+
+        if not tarifas:
+            # Manejar el caso de una lista vacía
+            return None
+
+        mayorTarifa = tarifas[0]
+
+        for tarifa in tarifas:
+            if tarifa.importe_instruccion > mayorTarifa.importe_instruccion:
+                mayorTarifa = tarifa
+
+        return mayorTarifa
+    
     def obtenerUnRecibo(self, numRecibo):
         try:
 
@@ -312,7 +326,11 @@ class RecibosController:
                 if aeronave:
                     #me traigo la tarifa del avion
                     tarifa = Tarifas.query.filter_by(aeronaves_id=aeronave.id_aeronaves).first()
+                    tarifasTotales = Tarifas.query.all()
+
+                    tarifaInstructor = RecibosController.__obtenerMayorTarifa(tarifasTotales)
                     #arranco un array para guardar el precio por itinerario
+                    print(f"Esta es la tarifa mas cara: {tarifaInstructor}")
                     precioItinerarios = []
                     
                     #vamos a recorrer los itinerarios para calcular todo lo que se tiene que
@@ -341,7 +359,7 @@ class RecibosController:
                             print(f"tarifa: {tarifa}")
 
                             precioCadaItinerario = {"vuelo":tarifa.importe_vuelo*horas,
-                                                    "instuccion":tarifa.importe_instruccion*horas} 
+                                                    "instuccion":tarifaInstructor.importe_instruccion*horas} 
                             precioItinerarios.append(precioCadaItinerario)
     
                             #si algun itineriario es con instruccion pero no hay uun instructor
@@ -483,9 +501,10 @@ class RecibosController:
                                         resUno = cuentaCorrienteController.retrotraer_pago(cuentaCorrienteController,montoAsociado,idCuentaCorrienteAsociado)
                                         print(f"se retrotrajo el pago del asociado: {resUno} ")
                                 db.session.commit()  
-                                return 5
-                                
-                            return 13     
+                                return 5                          
+
+                            return [13,recibo.numero_recibos]
+  
                         else:
                             return 6 
 
